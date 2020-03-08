@@ -2,6 +2,7 @@ package sshconfig
 
 import (
 	"bytes"
+	"io/ioutil"
 	"strings"
 	"testing"
 
@@ -69,4 +70,20 @@ func TestFindByHostname(t *testing.T) {
 	devHost := config.FindByHostname("dev")
 
 	assert.Equal(t, devHost.String(), devHostBlock)
+}
+
+func TestWriteToFilepath(t *testing.T) {
+	config, err := Parse(strings.NewReader(sshConfigExample))
+
+	assert.NoError(t, err)
+
+	err = config.WriteToFilepath("./example_config")
+
+	assert.NoError(t, err)
+
+	exampleConfigContents, err := ioutil.ReadFile("./example_config")
+
+	assert.NoError(t, err)
+
+	assert.Equal(t, sshConfigExample, string(exampleConfigContents))
 }
