@@ -13,16 +13,19 @@ import (
 )
 
 type (
+	// Config struct for the entire SSH config file
 	Config struct {
 		Source  []byte
 		Globals []*Param
 		Hosts   []*Host
 	}
+	// Host struct for host entries
 	Host struct {
 		Comments  []string
 		Hostnames []string
 		Params    []*Param
 	}
+	// Param struct for parameters for configuration
 	Param struct {
 		Comments []string
 		Keyword  string
@@ -30,6 +33,8 @@ type (
 	}
 )
 
+// All SSH config configuration options
+// http://man7.org/linux/man-pages/man5/ssh_config.5.html#top_of_page
 const (
 	HostKeyword                             = "Host"
 	MatchKeyword                            = "Match"
