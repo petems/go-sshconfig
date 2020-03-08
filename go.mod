@@ -1,4 +1,4 @@
-module github.com/petems/sshconfig
+module github.com/petems/go-sshconfig
 
 go 1.13
 
