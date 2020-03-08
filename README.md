@@ -1,6 +1,7 @@
-# ssh_config
-a simple ssh config parser/writer lib
+# go-sshconfig
+A simple ssh config parser/writer lib
 
+Based heavily on https://github.com/emptyinterface/sshconfig/
 
 Example:
 

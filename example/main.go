@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/emptyinterface/sshconfig"
+	"github.com/petems/sshconfig"
 )
 
 func main() {
