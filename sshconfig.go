@@ -126,6 +126,7 @@ const (
 	HostConfigurationHeader   = "# host-based configuration"
 )
 
+// NewHost creates a new parameter based on the main objects: the hostnames and comments
 func NewHost(hostnames []string, comments []string) *Host {
 	return &Host{
 		Comments:  comments,
@@ -156,6 +157,7 @@ func (host *Host) String() string {
 
 }
 
+// NewParam creates a new parameter based on the main objects: the keyword, the argument and a comment
 func NewParam(keyword string, args []string, comments []string) *Param {
 	return &Param{
 		Comments: comments,
@@ -184,6 +186,7 @@ func (param *Param) String() string {
 
 }
 
+// Value returns the current value for a given parameter
 func (param *Param) Value() string {
 	if len(param.Args) > 0 {
 		return param.Args[0]
@@ -191,6 +194,9 @@ func (param *Param) Value() string {
 	return ""
 }
 
+// Parse is the main guts of the library
+// It reads from a given io.Reader and parses it
+// into a ssh config object
 func Parse(r io.Reader) (*Config, error) {
 
 	// dat state
@@ -273,6 +279,8 @@ func Parse(r io.Reader) (*Config, error) {
 
 }
 
+// WriteTo writes to an io.Writer the config file
+// This is useful for outputting an SSH config to stdout
 func (config *Config) WriteTo(w io.Writer) error {
 
 	fmt.Fprintln(w)
@@ -292,17 +300,18 @@ func (config *Config) WriteTo(w io.Writer) error {
 	return nil
 }
 
-func (config *Config) WriteToFilepath(file_path string) error {
+// WriteToFilepath creates a file on disk at a given path from a given sshconfig object
+func (config *Config) WriteToFilepath(filePath string) error {
 
 	// create a tmp file in the same path with the same mode
-	tmp_file_path := file_path + "." + strconv.FormatInt(time.Now().UnixNano(), 10)
+	tmpFilePath := filePath + "." + strconv.FormatInt(time.Now().UnixNano(), 10)
 
 	var mode os.FileMode = 0600
-	if stat, err := os.Stat(file_path); err == nil {
+	if stat, err := os.Stat(filePath); err == nil {
 		mode = stat.Mode()
 	}
 
-	file, err := os.OpenFile(tmp_file_path, os.O_CREATE|os.O_WRONLY|os.O_EXCL|os.O_SYNC, mode)
+	file, err := os.OpenFile(tmpFilePath, os.O_CREATE|os.O_WRONLY|os.O_EXCL|os.O_SYNC, mode)
 	if err != nil {
 		return err
 	}
@@ -316,7 +325,7 @@ func (config *Config) WriteToFilepath(file_path string) error {
 		return err
 	}
 
-	if err := os.Rename(tmp_file_path, file_path); err != nil {
+	if err := os.Rename(tmpFilePath, filePath); err != nil {
 		return err
 	}
 
@@ -324,6 +333,7 @@ func (config *Config) WriteToFilepath(file_path string) error {
 
 }
 
+// GetParam returns a global parameter from an SSH config file
 func (config *Config) GetParam(keyword string) *Param {
 	for _, param := range config.Globals {
 		if param.Keyword == keyword {
@@ -333,6 +343,7 @@ func (config *Config) GetParam(keyword string) *Param {
 	return nil
 }
 
+// GetHost returns a host from an SSH config file
 func (config *Config) GetHost(hostname string) *Host {
 	for _, host := range config.Hosts {
 		for _, hn := range host.Hostnames {
@@ -344,6 +355,7 @@ func (config *Config) GetHost(hostname string) *Host {
 	return nil
 }
 
+// GetParam returns a parameter for a specific host
 func (host *Host) GetParam(keyword string) *Param {
 	for _, param := range host.Params {
 		if param.Keyword == keyword {
@@ -353,6 +365,9 @@ func (host *Host) GetParam(keyword string) *Param {
 	return nil
 }
 
+// FindByHostname takes a string argument of a host name
+// then searches through the ssh config for that host
+// 	config.FindByHostname("github.com")
 func (config *Config) FindByHostname(hostname string) *Host {
 	for _, host := range config.Hosts {
 		for _, hn := range host.Hostnames {

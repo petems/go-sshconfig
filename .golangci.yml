@@ -20,6 +20,11 @@ linters:
   disable:
     - errcheck
 
+linters-settings:
+  govet:
+    disable:
+      -  stdmethods
+
 issues:
   exclude-use-default: false
   exclude:
