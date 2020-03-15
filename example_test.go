@@ -58,6 +58,36 @@ Host dev
 	// Output: HostName 127.0.0.1
 }
 
+func ExampleParam_Value() {
+
+	sshConfigExample := `
+# global configuration
+VisualHostKey yes
+
+# host-based configuration
+
+# dev
+Host dev
+  HostName 127.0.0.1
+  User ubuntu
+  Port 22
+
+Host *.google.com *.yahoo.com
+  User root
+`
+
+	config, err := Parse(strings.NewReader(sshConfigExample))
+
+	if err != nil {
+		panic(err)
+	}
+
+	visualHostKey := config.GetParam(VisualHostKeyKeyword)
+
+	fmt.Println(visualHostKey.Value())
+	// Output: yes
+}
+
 func ExampleNewParam() {
 
 	param := NewParam(VisualHostKeyKeyword, []string{"yes"}, []string{"Add ascii art of key, see https://man.openbsd.org/ssh_config.5#VisualHostKey"})
