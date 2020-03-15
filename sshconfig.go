@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	writerhelper "github.com/petems/go-sshconfig/internal"
 )
 
 type (
@@ -279,25 +281,27 @@ func Parse(r io.Reader) (*Config, error) {
 
 }
 
-// WriteTo writes to an io.Writer the config file
+// WriteTo writes a ssh confg object to an io.Writer
 // This is useful for outputting an SSH config to stdout
-func (config *Config) WriteTo(w io.Writer) error {
+func (config *Config) WriteTo(w io.Writer) (int64, error) {
 
-	fmt.Fprintln(w)
-	fmt.Fprintln(w, GlobalConfigurationHeader)
+	wc := writerhelper.NewWriteCounter(w)
+
+	fmt.Fprintln(wc)
+	fmt.Fprintln(wc, GlobalConfigurationHeader)
 
 	for _, param := range config.Globals {
 		fmt.Fprint(w, param.String())
 	}
 
-	fmt.Fprintln(w)
-	fmt.Fprintln(w, HostConfigurationHeader)
+	fmt.Fprintln(wc)
+	fmt.Fprintln(wc, HostConfigurationHeader)
 
 	for _, host := range config.Hosts {
-		fmt.Fprint(w, host.String())
+		fmt.Fprint(wc, host.String())
 	}
 
-	return nil
+	return wc.Written(), nil
 }
 
 // WriteToFilepath creates a file on disk at a given path from a given sshconfig object
@@ -316,7 +320,7 @@ func (config *Config) WriteToFilepath(filePath string) error {
 		return err
 	}
 
-	if err := config.WriteTo(file); err != nil {
+	if _, err := config.WriteTo(file); err != nil {
 		file.Close()
 		return err
 	}
