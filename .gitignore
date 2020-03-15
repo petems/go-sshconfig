@@ -1,2 +1,3 @@
 *.out
 example_config
+example/*
