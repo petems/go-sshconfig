@@ -416,3 +416,18 @@ func printComments(comments []string) (commentString string) {
 	}
 	return ""
 }
+
+// AddHost appends a host to a config
+func (config *Config) AddHost(host *Host) {
+	config.Hosts = append(config.Hosts, host)
+}
+
+// AddParam appends a parameter to a specific host
+func (host *Host) AddParam(param *Param) {
+	host.Params = append(host.Params, param)
+}
+
+// AddParam appends a parameter to global parameters for a config
+func (config *Config) AddParam(param *Param) {
+	config.Globals = append(config.Globals, param)
+}

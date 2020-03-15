@@ -36,11 +36,94 @@ Host *.google.com *.yahoo.com
 }
 
 func ExampleConfig_GetHost() {
-	sshConfigExample := `
+	getHostBlock := `
+Host get-host
+  HostName 127.0.0.1
+  User ubuntu
+  Port 22
+`
+
+	config, err := Parse(strings.NewReader(getHostBlock))
+
+	if err != nil {
+		panic(err)
+	}
+
+	devHost := config.GetHost("get-host")
+
+	fmt.Println(devHost)
+	// Output:
+	// Host get-host
+	//   HostName 127.0.0.1
+	//   User ubuntu
+	//   Port 22
+}
+
+func ExampleConfig_AddHost() {
+	addHostBlock := `
 Host dev
   HostName 127.0.0.1
   User ubuntu
   Port 22
+`
+
+	config, err := Parse(strings.NewReader(addHostBlock))
+
+	if err != nil {
+		panic(err)
+	}
+
+	gitExampleHost := NewHost([]string{"git.example.com"}, []string{"My cool git server"})
+
+	config.AddHost(gitExampleHost)
+
+	config.WriteTo(os.Stdout)
+	// Output:
+	// # global configuration
+	//
+	// # host-based configuration
+	//
+	// Host dev
+	//   HostName 127.0.0.1
+	//   User ubuntu
+	//   Port 22
+	//
+	// # My cool git server
+	// Host git.example.com
+}
+
+func ExampleHost_AddParam() {
+	addParamBlock := `
+Host dev
+  HostName 127.0.0.1
+  User ubuntu
+  Port 22
+`
+
+	config, err := Parse(strings.NewReader(addParamBlock))
+
+	if err != nil {
+		panic(err)
+	}
+
+	devHost := config.GetHost("dev")
+
+	knownHostsParam := NewParam(UserKnownHostsFileKeyword, []string{"/dev/null"}, nil)
+
+	devHost.AddParam(knownHostsParam)
+
+	fmt.Println(devHost)
+	// Output:
+	// Host dev
+	//   HostName 127.0.0.1
+	//   User ubuntu
+	//   Port 22
+	//   UserKnownHostsFile /dev/null
+}
+
+func ExampleHost_AddParam_withcomment() {
+	sshConfigExample := `
+Host dev
 `
 
 	config, err := Parse(strings.NewReader(sshConfigExample))
@@ -51,12 +134,15 @@ Host dev
 
 	devHost := config.GetHost("dev")
 
+	knownHostsParam := NewParam(UserKnownHostsFileKeyword, []string{"/dev/null"}, []string{"MITM dont scare me"})
+
+	devHost.AddParam(knownHostsParam)
+
 	fmt.Println(devHost)
 	// Output:
 	// Host dev
-	//   HostName 127.0.0.1
-	//   User ubuntu
-	//   Port 22
+	//   # MITM dont scare me
+	//   UserKnownHostsFile /dev/null
 }
 
 func ExampleConfig_FindByHostname() {
