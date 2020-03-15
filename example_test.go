@@ -34,6 +34,54 @@ Host *.google.com *.yahoo.com
 	// Output: VisualHostKey yes
 }
 
+func ExampleConfig_GetHost() {
+	sshConfigExample := `
+Host dev
+  HostName 127.0.0.1
+  User ubuntu
+  Port 22
+`
+
+	config, err := Parse(strings.NewReader(sshConfigExample))
+
+	if err != nil {
+		panic(err)
+	}
+
+	devHost := config.GetHost("dev")
+
+	fmt.Println(devHost)
+	// Output:
+	// Host dev
+	//   HostName 127.0.0.1
+	//   User ubuntu
+	//   Port 22
+}
+
+func ExampleConfig_FindByHostname() {
+	sshConfigExample := `
+Host dev
+  HostName dev.example.com
+  User ubuntu
+  Port 22
+`
+
+	config, err := Parse(strings.NewReader(sshConfigExample))
+
+	if err != nil {
+		panic(err)
+	}
+
+	devExampleHost := config.FindByHostname("dev.example.com")
+
+	fmt.Println(devExampleHost)
+	// Output:
+	// Host dev
+	//   HostName dev.example.com
+	//   User ubuntu
+	//   Port 22
+}
+
 func ExampleHost_GetParam() {
 
 	sshDevHostBlock := `

@@ -365,9 +365,9 @@ func (host *Host) GetParam(keyword string) *Param {
 	return nil
 }
 
-// FindByHostname takes a string argument of a host name
-// then searches through the ssh config for that host
-// 	config.FindByHostname("github.com")
+// FindByHostname checks for a host in the config
+// It searches both the main host blocks as well as
+// hostname fields within host blocks
 func (config *Config) FindByHostname(hostname string) *Host {
 	for _, host := range config.Hosts {
 		for _, hn := range host.Hostnames {

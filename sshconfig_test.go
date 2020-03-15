@@ -60,13 +60,24 @@ func TestGetParam(t *testing.T) {
 	assert.Equal(t, visualHostKey.Value(), "yes")
 }
 
-func TestFindByHostname(t *testing.T) {
+func TestFindByHostname_Host(t *testing.T) {
 
 	config, err := Parse(strings.NewReader(sshConfigTest))
 
 	assert.NoError(t, err)
 
 	devHost := config.FindByHostname("dev")
+
+	assert.Equal(t, devHost.String(), devHostBlockTest)
+}
+
+func TestFindByHostname_InParam(t *testing.T) {
+
+	config, err := Parse(strings.NewReader(sshConfigTest))
+
+	assert.NoError(t, err)
+
+	devHost := config.FindByHostname("127.0.0.1")
 
 	assert.Equal(t, devHost.String(), devHostBlockTest)
 }
