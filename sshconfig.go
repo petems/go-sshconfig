@@ -34,7 +34,7 @@ type (
 )
 
 // All SSH config configuration options
-// http://man7.org/linux/man-pages/man5/ssh_config.5.html#top_of_page
+// See http://man7.org/linux/man-pages/man5/ssh_config.5.html#top_of_page
 const (
 	HostKeyword                             = "Host"
 	MatchKeyword                            = "Match"

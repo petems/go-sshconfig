@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	sshConfigExample = `
+	sshConfigTest = `
 # global configuration
 VisualHostKey yes
 
@@ -26,7 +26,7 @@ Host *.google.com *.yahoo.com
   User root
 `
 
-	devHostBlock = `
+	devHostBlockTest = `
 # dev
 Host dev
   HostName 127.0.0.1
@@ -37,7 +37,7 @@ Host dev
 
 func TestParseAndWriteTo(t *testing.T) {
 
-	config, err := Parse(strings.NewReader(sshConfigExample))
+	config, err := Parse(strings.NewReader(sshConfigTest))
 	if err != nil {
 		t.Error(err)
 	}
@@ -46,12 +46,12 @@ func TestParseAndWriteTo(t *testing.T) {
 
 	config.WriteTo(buf)
 
-	assert.Equal(t, sshConfigExample, buf.String())
+	assert.Equal(t, sshConfigTest, buf.String())
 }
 
 func TestGetParam(t *testing.T) {
 
-	config, err := Parse(strings.NewReader(sshConfigExample))
+	config, err := Parse(strings.NewReader(sshConfigTest))
 
 	assert.NoError(t, err)
 
@@ -62,17 +62,17 @@ func TestGetParam(t *testing.T) {
 
 func TestFindByHostname(t *testing.T) {
 
-	config, err := Parse(strings.NewReader(sshConfigExample))
+	config, err := Parse(strings.NewReader(sshConfigTest))
 
 	assert.NoError(t, err)
 
 	devHost := config.FindByHostname("dev")
 
-	assert.Equal(t, devHost.String(), devHostBlock)
+	assert.Equal(t, devHost.String(), devHostBlockTest)
 }
 
 func TestWriteToFilepath(t *testing.T) {
-	config, err := Parse(strings.NewReader(sshConfigExample))
+	config, err := Parse(strings.NewReader(sshConfigTest))
 
 	assert.NoError(t, err)
 
@@ -84,5 +84,5 @@ func TestWriteToFilepath(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	assert.Equal(t, sshConfigExample, string(exampleConfigContents))
+	assert.Equal(t, sshConfigTest, string(exampleConfigContents))
 }
