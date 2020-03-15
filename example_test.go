@@ -2,6 +2,7 @@ package sshconfig
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -144,6 +145,68 @@ func ExampleNewParam() {
 	// Output:
 	// # Add ascii art of key, see https://man.openbsd.org/ssh_config.5#VisualHostKey
 	// VisualHostKey yes
+}
+
+func ExampleNewParam_hostwithcomment() {
+	sshConfigExample := `
+Host dev
+	HostName 127.0.0.1
+	User ubuntu
+`
+
+	config, err := Parse(strings.NewReader(sshConfigExample))
+
+	if err != nil {
+		panic(err)
+	}
+
+	devHost := config.GetHost("dev")
+
+	knownHostsParam := NewParam(UserKnownHostsFileKeyword, []string{"/dev/null"}, []string{"MITM dont scare me"})
+
+	devHost.Params = append(devHost.Params, knownHostsParam)
+
+	fmt.Println(devHost)
+	// Output:
+	// Host dev
+	//   HostName 127.0.0.1
+	//   User ubuntu
+	//   # MITM dont scare me
+	//   UserKnownHostsFile /dev/null
+}
+
+func ExampleNewParam_globalwithcomment() {
+	sshConfigExample := `
+Host dev
+	HostName 127.0.0.1
+	User ubuntu
+`
+
+	config, err := Parse(strings.NewReader(sshConfigExample))
+
+	if err != nil {
+		panic(err)
+	}
+
+	param := NewParam(VisualHostKeyKeyword, []string{"yes"}, []string{"Add ascii art of key, see https://man.openbsd.org/ssh_config.5#VisualHostKey"})
+
+	config.Globals = append(config.Globals, param)
+
+	config.WriteTo(os.Stdout)
+	// Output:
+	// # global configuration
+	// # Add ascii art of key, see https://man.openbsd.org/ssh_config.5#VisualHostKey
+	// VisualHostKey yes
+
+	// # host-based configuration
+
+	// Host dev
+	// 	HostName 127.0.0.1
+	// 	User ubuntu
+	// want:
+	// Host dev
+	// 	# MITM dont scare me
+	// 	UserKnownHostsFile /dev/null
 }
 
 func ExampleNewHost() {
