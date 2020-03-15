@@ -152,8 +152,26 @@ func (host *Host) String() string {
 
 	fmt.Fprintf(buf, "%s %s\n", HostKeyword, strings.Join(host.Hostnames, " "))
 	for _, param := range host.Params {
-		fmt.Fprint(buf, "  ", param.String())
+		fmt.Fprint(buf, param.HostParamString())
 	}
+
+	return buf.String()
+
+}
+
+// HostParamString formats parameters for hosts
+// It needs some additional logic so that comments are indented
+func (param *Param) HostParamString() string {
+
+	buf := &bytes.Buffer{}
+
+	commentString := printComments(param.Comments)
+
+	if commentString != "" {
+		fmt.Fprintln(buf, fmt.Sprintf("  %s", commentString))
+	}
+
+	fmt.Fprintf(buf, "  %s %s\n", param.Keyword, strings.Join(param.Args, " "))
 
 	return buf.String()
 
@@ -172,14 +190,10 @@ func (param *Param) String() string {
 
 	buf := &bytes.Buffer{}
 
-	if len(param.Comments) > 0 {
-		fmt.Fprintln(buf)
-		for _, comment := range param.Comments {
-			if !strings.HasPrefix(comment, "#") {
-				comment = "# " + comment
-			}
-			fmt.Fprintln(buf, comment)
-		}
+	commentString := printComments(param.Comments)
+
+	if commentString != "" {
+		fmt.Fprintln(buf, commentString)
 	}
 
 	fmt.Fprintf(buf, "%s %s\n", param.Keyword, strings.Join(param.Args, " "))
@@ -388,4 +402,17 @@ func (config *Config) FindByHostname(hostname string) *Host {
 		}
 	}
 	return nil
+}
+
+func printComments(comments []string) (commentString string) {
+	if len(comments) > 0 {
+		for _, comment := range comments {
+			if !strings.HasPrefix(comment, "#") {
+				comment = "# " + comment
+			}
+			commentString += comment
+		}
+		return commentString
+	}
+	return ""
 }
