@@ -33,6 +33,15 @@ Host dev
   User ubuntu
   Port 22
 `
+
+	githubBlockTest = `
+# github.com global config
+Host github.com
+  ControlMaster auto
+  ControlPath ~/.ssh/ssh-%r@%h:%p
+  ControlPersist yes
+  User git
+`
 )
 
 func TestParseAndWriteTo(t *testing.T) {
@@ -58,6 +67,29 @@ func TestGetParam(t *testing.T) {
 	visualHostKey := config.GetParam(VisualHostKeyKeyword)
 
 	assert.Equal(t, visualHostKey.Value(), "yes")
+}
+
+func TestHostParamString(t *testing.T) {
+
+	githubhost := NewHost([]string{"github.com"}, []string{"github.com global config"})
+
+	controlmasterParam := NewParam(ControlMasterKeyword, []string{"auto"}, []string{})
+	controlpathParam := NewParam(ControlPathKeyword, []string{"~/.ssh/ssh-%r@%h:%p"}, []string{})
+	controlpersistParam := NewParam(ControlPersistKeyword, []string{"yes"}, []string{})
+	userParam := NewParam(UserKeyword, []string{"git"}, []string{})
+
+	newParams := []*Param{
+		controlmasterParam,
+		controlpathParam,
+		controlpersistParam,
+		userParam,
+	}
+
+	for i := 0; i < len(newParams); i++ {
+		githubhost.AddParam(newParams[i])
+	}
+
+	assert.Equal(t, githubhost.String(), githubBlockTest)
 }
 
 func TestFindByHostname_Host(t *testing.T) {
