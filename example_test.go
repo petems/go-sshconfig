@@ -304,3 +304,33 @@ func ExampleNewHost() {
 	// # My cool git server
 	// Host git.example.com
 }
+
+func ExampleNewHost_githubdotcomexample() {
+
+	githubhost := NewHost([]string{"github.com"}, []string{"github.com global config"})
+
+	controlmasterParam := NewParam(ControlMasterKeyword, []string{"auto"}, []string{})
+	controlpathParam := NewParam(ControlPathKeyword, []string{"~/.ssh/ssh-%r@%h:%p"}, []string{})
+	controlpersistParam := NewParam(ControlPersistKeyword, []string{"yes"}, []string{})
+	userParam := NewParam(UserKeyword, []string{"git"}, []string{})
+
+	newParams := []*Param{
+		controlmasterParam,
+		controlpathParam,
+		controlpersistParam,
+		userParam,
+	}
+
+	for i := 0; i < len(newParams); i++ {
+		githubhost.AddParam(newParams[i])
+	}
+
+	fmt.Println(githubhost)
+	// Output:
+	// # github.com global config
+	// Host github.com
+	//   ControlMaster auto
+	//   ControlPath ~/.ssh/ssh-%r@%h:%p
+	//   ControlPersist yes
+	//   User git
+}
